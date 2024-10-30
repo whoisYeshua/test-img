@@ -1,45 +1,50 @@
-import { useState } from 'react'
-import Cropper, { type Area } from 'react-easy-crop'
-import { compressImage, getCroppedImg, formatFileSize } from './utils'
-import { useUploader } from './UploaderContext'
+import { useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
+import { compressImage, getCroppedImg, formatFileSize } from "./utils";
+import { useUploader } from "./UploaderContext";
 
 interface EasyCropProps {
-  imageSrc: string
-  onCrop: any
+  imageSrc: string;
+  onCrop: any;
 }
 
 export const EasyCrop = ({ imageSrc, onCrop }: EasyCropProps) => {
-  const { setUploaderData } = useUploader()
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const { setUploaderData } = useUploader();
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const onCropComplete = (_croppedArea: Area, croppedAreaPixels: Area) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
 
   const showCroppedImage = async () => {
     try {
-      if (!croppedAreaPixels) return
-      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels)
-      if (!croppedImageBlob) return
+      if (!croppedAreaPixels) return;
+      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      if (!croppedImageBlob) return;
 
-      const imageFile = new File([croppedImageBlob.blob], 'my-image', { type: 'image/jpeg' })
-      console.log('Before compress', formatFileSize(imageFile.size))
-      const compressedImage = await compressImage(imageFile, { quality: 0.8 })
+      const imageFile = new File([croppedImageBlob.blob], "my-image", {
+        type: "image/jpeg",
+      });
+      console.log("Before compress", formatFileSize(imageFile.size));
+      const compressedImage = await compressImage(imageFile, { quality: 0.8 });
       console.log(
-        setUploaderData({ fileSize: compressedImage.size, fileType: compressedImage.type })
-      )
-      console.log('After compress', formatFileSize(compressedImage.size))
-      onCrop(URL.createObjectURL(compressedImage))
+        setUploaderData({
+          fileSize: compressedImage.size,
+          fileType: compressedImage.type,
+        })
+      );
+      console.log("After compress", formatFileSize(compressedImage.size));
+      onCrop(URL.createObjectURL(compressedImage));
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
-  }
+  };
 
   return (
     <>
-      <div style={{ position: 'relative', width: 500, height: 500 }}>
+      <div style={{ position: "relative", width: 470, height: 470 }}>
         <Cropper
           image={imageSrc}
           crop={crop}
@@ -54,5 +59,5 @@ export const EasyCrop = ({ imageSrc, onCrop }: EasyCropProps) => {
       </div>
       <button onClick={showCroppedImage}>Save</button>
     </>
-  )
-}
+  );
+};
